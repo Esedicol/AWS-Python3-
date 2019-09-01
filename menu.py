@@ -50,3 +50,52 @@ def main_menu():
 
   return
 
+import instance
+ # ------------------------------instance menu -------------------------------
+def instance_menu():
+  os.system('clear')
+  while True:
+    print ('''
+     ===========================================
+                      Instance
+     ===========================================
+     ''')
+    print ("Select one the following to start:")
+    print ("1. Create Instance")
+    print ("2. List Instance")
+    print ("3. Start Instance")
+    print ("4. Stop Instance")
+    print ("5. Terminate Instance")
+    print ("6. Tags")
+    print ("7. SSH")
+    print ("\n9. Back")
+    print ("\n0. Quit")
+
+    choice = input(" >>>  ")
+
+    if choice == '1':
+      instance.create_instance()
+    elif choice == '2':
+      instance.list_instance()
+    elif choice == '3':
+      instance.start_instance()
+    elif choice == '4':
+      instance.stop_instance()
+    elif choice == '5':
+      instance.terminate_instance()
+    elif choice == '6':
+      instance.tags()
+    elif choice == '7':
+      instance.ssh()
+    elif choice == '9':
+      back()
+    elif choice == '0':
+      exit()
+    else:
+      instance_menu()
+
+ 
+
+
+if __name__ == '__main__':
+  main()
