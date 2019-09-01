@@ -67,7 +67,7 @@ def instance_menu():
     print ("4. Stop Instance")
     print ("5. Terminate Instance")
     print ("6. Tags")
-    print ("7. SSH")
+    print ("7. Open Instance")
     print ("\n9. Back")
     print ("\n0. Quit")
 
@@ -86,7 +86,7 @@ def instance_menu():
     elif choice == '6':
       instance.tags()
     elif choice == '7':
-      instance.ssh()
+      instance.xx()
     elif choice == '9':
       back()
     elif choice == '0':
