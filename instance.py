@@ -7,15 +7,14 @@ import boto3
 import time
 import webbrowser
 
-def xx():
-    os.system('clear')
+def openInstance():
     ec2 = boto3.resource('ec2')
-
+    os.system('clear')
     print ('''
-     ===========================================
-                   List of Instances
-     ===========================================
-     ''')
+         ===========================================
+                       List of Instances
+         ===========================================
+         ''')
 
     ints = []
     for i in ec2.instances.all():
@@ -28,7 +27,20 @@ def xx():
     index = input (' >>> ')
 
     instance = ints[int(index) - 1]
-    print(instance)
+
+    instance.wait_until_running()
+    instance.load()
+
+    try:
+        os.system('clear')
+        print("Opening" + instance.public_dns_name + "on a new web browser :)")
+        dns = instance.public_dns_name
+        webbrowser.open("http://" + dns, new=2)
+    except Exception as error:
+        print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n\n')
+        print(instance.stat
+            )
+        print(error)
 
 # ----------------------------- keys -------------------------------------
 def delete_keys():
@@ -181,9 +193,8 @@ def create_instance():
     key_def = 'mawe-key.pem'
     if(key == ''):
         key = key_def
-    else:
-        create(key)
-
+    
+    print('')
     print('Please enter the name of your choice of security group or press enter to select the default group')
     group = input(' >>> ')
 
@@ -191,15 +202,17 @@ def create_instance():
     if(group == ''):
         group = default
 
-def create(key):
+    create(key, group)
+
+def create(k, g):
     try: 
         ec2 = boto3.resource('ec2')
         instance = ec2.create_instances(
             ImageId='ami-0bbc25e23a7640b9b',
-            KeyName = key,                                # my key name
+            KeyName = k,                                # my key name
             MinCount=1,
             MaxCount=1,
-            SecurityGroupIds=[group],    # my HTTP/SSH sec group
+            SecurityGroupIds=[g],    # my HTTP/SSH sec group
             UserData='''#!/bin/bash
                         sudo yum update -y
                         sudo yum install python3 -y
@@ -368,7 +381,7 @@ def list_file():
      ===========================================
      ''')
 
-    path = "/Users/esedicol/Desktop/DevOps"
+    path = '/Users/mawesedicol/Desktop/AWS'
     for file in os.listdir(path):
         if file.endswith(".txt"):
             print("\nFile name => ",file)
@@ -383,7 +396,6 @@ def del_file():
                    Delete File
      ===========================================
      ''')
-    list_file()
 
     print ("\nEnter name of file you wish to delete: ")
     delFile = input(" >>> ")

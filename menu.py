@@ -86,7 +86,7 @@ def instance_menu():
     elif choice == '6':
       instance.tags()
     elif choice == '7':
-      instance.xx()
+      instance.openInstance()
     elif choice == '9':
       back()
     elif choice == '0':
