@@ -30,14 +30,14 @@ def openInstance():
 
     instance = ints[int(index) - 1]
     instance.start()
-    print('\nInstance Starting')
+    print('\nInstance Starting ..........')
     time.sleep(5)
 
     instance.wait_until_running()
     instance.load()
 
     try:
-        print("Opening" + instance.public_dns_name + " on a new web browser :)")
+        print("Opening: " + instance.public_dns_name + " on a new web browser :)")
         dns = instance.public_dns_name
         webbrowser.open("http://" + dns, new=2)
 
@@ -65,6 +65,8 @@ def list_keys():
                 Listing all keys
      ===========================================
      ''')
+
+    # Directory of project
     path = "/Users/mawesedicol/Desktop/AWS"
     for file in os.listdir(path):
         if file.endswith(".pem"):
@@ -155,7 +157,12 @@ def create_instance():
     name = input(' >>> ')
     name_tag = {'Key': 'Name', 'Value': name}
 
-    print('\nEnter a valid key name')
+    # List Keys for user
+    print('\n\n')
+    list_keys()
+    print('')
+
+    print('\nEnter one of the keys from the lists above (dont include the extension)')
     key = input(' >>> ')
 
     key_def = 'mawe-key.pem'

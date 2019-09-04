@@ -50,11 +50,11 @@ def delete_buckets():
     bucket_name = s3.Bucket(name)
     try:
         response = bucket_name.delete()
-        print ("\n< --------- Deleting ", name, " .... --------- >")
-        print('')
-        print ("< ------- Bucket Succesfully deleted !!!! ------ >")
+        print ("\nDeleting ", name, " .................")
+        time.sleep(3)
+        print ("\n\n< ------- Bucket Succesfully deleted !!!! ------ >")
     except Exception as error:
-        print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >')
+        print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n')
         print(error)
 
 
@@ -124,7 +124,7 @@ def uploadImage():
     image = input(' >>> ')
     try:
         print('\n\nAdding ' + image + ' into ' + bucket_name + ' ........................')
-        time.sleep(5)
+        time.sleep(3)
         response = s3.Object(bucket_name, image).put(Body=open(image, 'rb'),  ACL='public-read')
         print('\nImage Successfully added to <' + bucket_name + '>')
 
@@ -143,14 +143,12 @@ def uploadImage():
             ints = []
             for i in ec2.instances.all():
                 ints.append(i)
-
             for x in range (0, len(ints)):
                 print (' Index ', x + 1, '=>\t', ints[x].id, " is ", ints[x].state)
-                print (' IP Adress : ' + ints[x].public_ip_address)
-                print('\n\n')
 
             print ("\nEneter the index of desired instance:")
             index = input (' >>> ')
+
             instance = ints[int(index) - 1]
 
             open_image(instance, bucket_name, image)
@@ -184,21 +182,24 @@ def open_image(instance, bucket_name, image):
     print('\n Enter Image Title')
     title = input(' >>> ')
 
-    # Creating a new html file where the title and image will be displated
-    index_html = '<html><div align="center"><h1 style="color: "color: #3379b8; font-family: "Source Serif Pro", "serif"; font-size: 34px; padding: .2em 0; border-bottom: 1px solid #ddd;">' + title + '</h1><img src="https://s3-eu-west-1.amazonaws.com/'+ bucket_name + '/' + image +'" width="50%" ></img></div></html>'
+    # Creating a new html file where the title and image will be displayed
+    html = '<html> <div align="center"> <h1><strong>' + title + '</strong></h1> <img src="https://s3-eu-west-1.amazonaws.com/' + str(bucket_name) + '/' + image + '" width="50%"></img> </div> </html>'
 
     # were going to use the echo command to insert the index line of code into an file
-    echo = "echo '"+ index_html + "' > index.html"
+    echo ="echo '" + html + "' > index.html"
     subprocess.run(echo, check=True, shell=True)
 
     # We will use the ssh command to change the permission into readable, writtable and executable by using the chmod command
-    change_permission = "ssh -t -o StrictHostKeyChecking=no -i "+ key +".pem ec2-user@" + instance.public_ip_address + " 'cd /usr/share/nginx/html/ ;sudo chmod 777 index.html' "
+    change_permission = "ssh -t -o StrictHostKeyChecking=no -i " + key + ".pem ec2-user@" + instance.public_ip_address + " 'cd /usr/share/nginx/html/ ;sudo chmod 777 index.html '"
 
     # We will use the SCP file transfer protocol to replace the index.html file in the nginx/html dir
     scp = "scp -i " + key + ".pem index.html ec2-user@" + instance.public_ip_address + ":/usr/share/nginx/html/index.html"
 
     # Changing permision to read only
     closePermission = "ssh -t -o StrictHostKeyChecking=no -i "+ key +".pem ec2-user@" + instance.public_ip_address + " 'cd /usr/share/nginx/html ;sudo chmod 444 index.html '"
+
+
+
 
 
     try:
