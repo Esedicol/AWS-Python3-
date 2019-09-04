@@ -6,6 +6,8 @@ import instance
 import boto3
 import time
 import webbrowser
+import time
+import subprocess
 
 def openInstance():
     ec2 = boto3.resource('ec2')
@@ -27,19 +29,20 @@ def openInstance():
     index = input (' >>> ')
 
     instance = ints[int(index) - 1]
+    instance.start()
+    print('\n\nInstance Starting')
+    time.sleep(5)
 
     instance.wait_until_running()
     instance.load()
 
     try:
-        os.system('clear')
-        print("Opening" + instance.public_dns_name + "on a new web browser :)")
+        print("Opening" + instance.public_dns_name + " on a new web browser :)")
         dns = instance.public_dns_name
         webbrowser.open("http://" + dns, new=2)
+
     except Exception as error:
         print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n\n')
-        print(instance.stat
-            )
         print(error)
 
 # ----------------------------- keys -------------------------------------
@@ -99,7 +102,7 @@ def create_key(key):
     # capture the key and store it in a file
     KeyPairOut = str(key_pair.key_material)
     print (KeyPairOut)
-    print ("\n < ------ Key Name : ", key, " succesfully created...YAY!!!!!! ------->\n\n")
+    print ("\n Key Name : ", key, " succesfully created...YAY!!!!!!\n\n")
     outfile.write(KeyPairOut)
 
 # ---------------------------- tags ----------------------------------
@@ -111,10 +114,6 @@ def tags():
                     Creating instance tag
          ===========================================
          ''')
-
-    print('Enter name for instance: ')
-    name = input(' >>> ')
-    name_tag = {'Key': 'Name', 'Value': name}
 
     ints = []
     for i in ec2.instances.all():
@@ -128,50 +127,18 @@ def tags():
 
     instance = ints[int(index) - 1]
 
+    print('\n\nEnter name for instance: ')
+    name = input(' >>> ')
+    name_tag = {'Key': 'Name', 'Value': name}
+
     try:
         instance.create_tags(Tags=[name_tag])
-        print ("\n------------------ Well Done a Tag has been added to: ", instance, "------------------\n\n")
+        print ("\nNew Tag has been added to: ", instance, "\n\n")
 
 
     except Exception as error:
-        print ("< ----- ERROR ----- >")
+        print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n\n')
         print(error)
-
-# ---------------------------- ssh ----------------------------------
-
-# def ssh():
-#     os.system('clear')
-#     ec2 = boto3.resource('ec2')
-
-#     ints = []
-#     for i in ec2.instances.all():
-#         ints.append(i)
-
-#     for x in range (0, len(ints)):
-#         print (' Index ', x + 1, '=>\t', ints[x].id, " is ", ints[x].state)
-
-#     print ("\nEneter the index of desired instance:")
-#     index = input (' >>> ')
-
-#     instance = ints[int(index) - 1]
-
-#     print("Enter key: ")
-#     key = input(' >>>  ')
-
-#     print("Enter command line  command: ")
-#     cmd = input(' >>> ')
-
-#     cmd1 = "ssh -t -o StrictHostKeyChecking=no -i" + key + "ec2-user@" + instance.public_ip_address + " 'sudo pwd'"
-
-#     try:
-#         (status, output) = subprocess.getstatusoutput(cmd1)
-#         if(status > 0):
-#             print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n\n')
-#         else:
-#             print("Command worked. \n",output)
-#     except Exception as error:
-#         print ("< ----- ERROR ----- >")
-#         print(error)
 
 
 # ----------------------------create instances ----------------------------------
@@ -202,9 +169,9 @@ def create_instance():
     if(group == ''):
         group = default
 
-    create(key, group)
+    create(name_tag,key, group)
 
-def create(k, g):
+def create(n, k, g):
     try: 
         ec2 = boto3.resource('ec2')
         instance = ec2.create_instances(
@@ -212,14 +179,16 @@ def create(k, g):
             KeyName = k,                                # my key name
             MinCount=1,
             MaxCount=1,
+            InstanceType='t2.micro',
             SecurityGroupIds=[g],    # my HTTP/SSH sec group
             UserData='''#!/bin/bash
                         sudo yum update -y
                         sudo yum install python3 -y
                         sudo amazon-linux-extras install nginx1.12 -y
                         sudo service nginx start
-                        chkconfig nginx on''',  # to check all ok
-            InstanceType='t2.micro')
+                        chkconfig nginx on'''
+            )
+        instance[0].create_tags(Tags=[n])
 
         print ("------------------ Well Done a new instance has been created ------------------\n\n")
         print ("\nInstance Id : " , instance[0].id)
@@ -280,10 +249,11 @@ def start_instance():
         else:
             instance.reload()
             instance.start()
-            print ("< ------ Instance running!! ------>")
+            print ("Instance is now running!! ")
 
     except Exception as error:
-        print ("< ----- ERROR ----- >")
+        print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n\n')
+        print(error)
 
 
 # ------------------------ stop instances ----------------------------------
@@ -315,10 +285,13 @@ def stop_instance():
         else:
             instance.reload()
             instance.stop()
-            print ("< ------ Instance stopping!! ------>")
+            print ("Instance stopping!! ")
+            time.sleep(5)
+            print('\n Done *__*')
 
     except Exception as error:
-        print ("< ----- ERROR ----- >")
+        print('\n< ----- !!!!OPSIES something went wrong!!!!! ----- >\n\n')
+        print(error)
 
 
 # ------------------------ stop instances ----------------------------------
@@ -350,7 +323,7 @@ def terminate_instance():
         else:
             instance.reload()
             instance.terminate()
-            print ("< ------ Instance terminating!! ------>")
+            print ("Instance terminated!! ")
 
     except Exception as error:
         print ("< ----- ERROR ----- >")
@@ -380,7 +353,6 @@ def list_file():
                    List File
      ===========================================
      ''')
-
     path = '/Users/mawesedicol/Desktop/AWS'
     for file in os.listdir(path):
         if file.endswith(".txt"):

@@ -94,7 +94,7 @@ def instance_menu():
     else:
       instance_menu()
 
- 
+
 import buckets
  # ------------------------------ bucket menu -------------------------------
 def bucket_menu():
@@ -107,10 +107,11 @@ def bucket_menu():
      ''')
     print ("Select one the following to start:")
     print ("1. Create Bucket")
-    print ("2. Add Files into Bucket")
+    print ("2. Add Image to Bucket and View in Browser")
     print ("3. List Buckets")
-    print ("4. Delete Bucket")
-    print ("5. Delete Bucket Contents")
+    print ("4. List Bucket Contents")
+    print ("5. Delete Bucket")
+    print ("6. Delete Bucket Contents")
     print ("\n9. Back")
     print ("\n0. Quit")
 
@@ -119,13 +120,16 @@ def bucket_menu():
     if choice == '1':
       buckets.create_bucket()
     elif choice == '2':
-      buckets.add_contents()
+      buckets.uploadImage()
     elif choice == '3':
       buckets.list_buckets()
     elif choice == '4':
-      buckets.delete_buckets()
+      buckets.list_contents()
     elif choice == '5':
+      buckets.delete_buckets()
+    elif choice == '6':
       buckets.delete_contents()
+
     elif choice == '9':
       back()
     elif choice == '0':
