@@ -30,7 +30,7 @@ def openInstance():
 
     instance = ints[int(index) - 1]
     instance.start()
-    print('\n\nInstance Starting')
+    print('\nInstance Starting')
     time.sleep(5)
 
     instance.wait_until_running()
@@ -47,6 +47,7 @@ def openInstance():
 
 # ----------------------------- keys -------------------------------------
 def delete_keys():
+    os.system('clear')
     list_keys()
     print ("\nEnter name of key you wish to delete: ")
     delKey = input(" >>> ")
@@ -64,7 +65,7 @@ def list_keys():
                 Listing all keys
      ===========================================
      ''')
-    path = "/Users/esedicol/Desktop/DevOps"
+    path = "/Users/mawesedicol/Desktop/AWS"
     for file in os.listdir(path):
         if file.endswith(".pem"):
             print("File name => ",file)
@@ -190,7 +191,7 @@ def create(n, k, g):
             )
         instance[0].create_tags(Tags=[n])
 
-        print ("------------------ Well Done a new instance has been created ------------------\n\n")
+        print ("Wohooo well done a new instance has been created\n\n")
         print ("\nInstance Id : " , instance[0].id)
         print ("Instance Status : ", instance[0].state)
         print ("Instance IPv4 : ", instance[0].public_ip_address)
